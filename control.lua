@@ -21,7 +21,7 @@ function checkButtonExistence(p)
         -- create stuffs heres
     else
         
-        print(mod_gui)
+        -- print(mod_gui)
         for k, v in pairs(game.players) do
             local flow = mod_gui.get_button_flow(v)
             if (flow['research-counter-button']) then
@@ -47,7 +47,7 @@ function buildGUI(ply)
         return
     end
 
-    if (table_size(global) == 0) then
+    if (table_size(storage) == 0) then
         refreshResearch()
     end
 
@@ -56,7 +56,7 @@ function buildGUI(ply)
     local frame = base.add({
         name = 'research-counter-base',
         caption = { 'research-counter.gui-frame-title' },
-        style = "inner_frame_in_outer_frame",
+        -- style = "inner_frame_in_outer_frame",
         direction = "vertical",
         -- tooltip = "Research Counter",
         type = "frame"
@@ -81,7 +81,7 @@ function buildGUI(ply)
     local tabbedPaneFrame = frame.add({
         name = "tabbedpaneFrame",
         type = 'frame',
-        style = "inside_deep_frame_for_tabs"
+        -- style = "inside_deep_frame_for_tabs"
     })
 
     tabbedPaneFrame.style.top_padding = 0
@@ -128,12 +128,12 @@ function buildGUI(ply)
     local individualScrollPane = tabbedPane.add({
         name = "individual-scroll-pane",
         type = 'scroll-pane',
-        style = 'filter_scroll_pane'
+        -- style = 'filter_scroll_pane'
     })
     local groupedScrollPane = tabbedPane.add({
         name = "grouped-scroll-pane",
         type = 'scroll-pane',
-        style = 'filter_scroll_pane'
+        -- style = 'filter_scroll_pane'
     })
 
     individualScrollPane.vertical_scroll_policy = 'always'
@@ -172,7 +172,7 @@ function buildGUI(ply)
     local individualFrame = individualScrollPane.add({
         name = "individual-tab-content-frame",
         type = 'frame',
-        style = 'filter_scroll_pane_background_frame'
+        -- style = 'filter_scroll_pane_background_frame'
     })
 
     individualFrame.style.horizontally_stretchable = true
@@ -186,7 +186,7 @@ function buildGUI(ply)
     local groupedFrame = groupedScrollPane.add({
         name = "grouped-tab-content-frame",
         type = 'frame',
-        style = 'inner_frame_in_outer_frame'
+        -- style = 'inner_frame_in_outer_frame'
     })
 
     groupedFrame.style.horizontally_stretchable = true
@@ -203,14 +203,14 @@ function buildGUI(ply)
     local individualTable = individualFrame.add({
         name = 'table',
         type = 'table',
-        style = 'filter_slot_table',
+        -- style = 'filter_slot_table',
         column_count = 10
     })
 
     local groupedTable = groupedFrame.add({
         name = 'table',
         type = 'table',
-        style = 'filter_slot_table',
+        -- style = 'filter_slot_table',
         column_count = 1
     })
 
@@ -235,7 +235,7 @@ function buildGUI(ply)
 
     -- populate keys for individual ingredients table
 
-    for k,v in pairs(global.researchIngredients.byID) do 
+    for k,v in pairs(storage.researchIngredients.byID) do 
         if (v.enabled) then
             counts.individual[v] = 0
         end
@@ -253,7 +253,7 @@ function buildGUI(ply)
 
     -- populate and count table for grouped ingredients
 
-    for groupName,group in pairs(global.allTechnologies.byIngredientGroup) do
+    for groupName,group in pairs(storage.allTechnologies.byIngredientGroup) do
         if (#groupName > 0) then
             counts.group[groupName] = 0
             for _, tech in pairs(group) do
@@ -265,7 +265,7 @@ function buildGUI(ply)
         end
     end
 
-    print("Research Counter: Generated player research count table..")
+    -- print("Research Counter: Generated player research count table..")
 
     -- populate indvidual GUI table
 
@@ -278,7 +278,7 @@ function buildGUI(ply)
             sprite = 'item/' .. k,
             tooltip = { 
                 "research-counter.individual-entry-tooltip",
-                game.item_prototypes[k].localised_name, formatNumberString(v) 
+                prototypes.item[k].localised_name, formatNumberString(v) 
             },
         })
     end
@@ -311,13 +311,13 @@ function buildGUI(ply)
         iconFlow.style.right_padding = 4
 
         local count = 0
-        for k2,v2 in pairs(global.researchIngredients.byGroupString[k]) do
+        for k2,v2 in pairs(storage.researchIngredients.byGroupString[k]) do
             
             local sprite = iconFlow.add({
                 name = v2,
                 type = 'sprite',
                 sprite = 'item/' .. v2,
-                tooltip = game.item_prototypes[v2].localised_name,
+                tooltip = prototypes.item[v2].localised_name,
                 -- style = 'transparent_slot'
             })
             if (count ~= 0) then
@@ -383,7 +383,7 @@ function buildGUI(ply)
 
     tabbedPane.add_tab(individualTab, individualScrollPane)
     tabbedPane.add_tab(groupedTab, groupedScrollPane)
-    print("GUI done!")
+    -- print("GUI done!")
 end
 
 function toggleGUI(ply)
@@ -408,7 +408,7 @@ end)
 
 script.on_event(defines.events.on_gui_click, function(e)
     local ply = game.players[e.player_index]
-    print("Pressed!")
+    -- print("Pressed!")
     if (e.element.name == 'research-counter-button') then
         toggleGUI(ply)
     end
@@ -428,12 +428,12 @@ function refreshResearch()
         return
     end
 
-    global.allTechnologies = {
+    storage.allTechnologies = {
         byName = {},
         byIngredient = {},
         byIngredientGroup = {}
     }
-    global.researchIngredients = {
+    storage.researchIngredients = {
         byName = {},
         byID = {},
         byGroupString = {},
@@ -457,11 +457,11 @@ function refreshResearch()
         }
 
         for k2, v2 in pairs(v.research_unit_ingredients) do
-            local ingredientID = global.researchIngredients.byName[v2.name]
+            local ingredientID = storage.researchIngredients.byName[v2.name]
             if (not ingredientID) then
                 ingredientID = count
-                global.researchIngredients.byName[v2.name] = ingredientID
-                global.researchIngredients.byID[ingredientID] = v2.name
+                storage.researchIngredients.byName[v2.name] = ingredientID
+                storage.researchIngredients.byID[ingredientID] = v2.name
                 count = count + 1;
             end
             tech.ingredients[v2.name] = ingredientID
@@ -471,21 +471,21 @@ function refreshResearch()
 
         tech.sortedIngredients = getSortedIngredientList(tech)
         tech.ingredientString = getIngredientString(tech)
-        global.researchIngredients.byGroupString[tech.ingredientString] =
-            global.researchIngredients.byGroupString[tech.ingredientString] or tech.ingredients
-        -- global.researchIngredients.byGroupString[tech.ingredientString] = tech.ingredientString
+        storage.researchIngredients.byGroupString[tech.ingredientString] =
+            storage.researchIngredients.byGroupString[tech.ingredientString] or tech.ingredients
+        -- storage.researchIngredients.byGroupString[tech.ingredientString] = tech.ingredientString
 
         -- add technology to each technology list
-        global.allTechnologies.byName[k] = tech
+        storage.allTechnologies.byName[k] = tech
         for k, v in pairs(tech.ingredients) do
-            if (not global.allTechnologies.byIngredient[k]) then
-                global.allTechnologies.byIngredient[k] = {}
+            if (not storage.allTechnologies.byIngredient[k]) then
+                storage.allTechnologies.byIngredient[k] = {}
             end
-            table.insert(global.allTechnologies.byIngredient[k], tech)
+            table.insert(storage.allTechnologies.byIngredient[k], tech)
         end
-        -- global.allTechnologies.byIngredientGroup[tech.ingredientString] =
-        --     global.allTechnologies.byIngredientGroup[tech.ingredientString] or {}
-        -- table.insert(global.allTechnologies.byIngredientGroup[tech.ingredientString], tech)
+        -- storage.allTechnologies.byIngredientGroup[tech.ingredientString] =
+        --     storage.allTechnologies.byIngredientGroup[tech.ingredientString] or {}
+        -- table.insert(storage.allTechnologies.byIngredientGroup[tech.ingredientString], tech)
         -- ------------------------------------------------------------------------
 
     end
@@ -493,7 +493,7 @@ function refreshResearch()
     buildIngredientGroupTables()
 
     
-    print("Research Counter: Building Global Research Ingredient Tables!")
+    -- print("Research Counter: Building Global Research Ingredient Tables!")
     -- print("Research Counter: Refreshed due to configuration change.")
 
 end
@@ -507,7 +507,7 @@ function getSortedIngredientList(tech)
     if (tech.research_unit_ingredients) then
         local ingredientsList = {}
         for k, v in pairs(tech.research_unit_ingredients) do
-            ingredientsList[global.researchIngredients.byName[v.name]] = true
+            ingredientsList[storage.researchIngredients.byName[v.name]] = true
         end
         return ingredientsList
     end
@@ -515,7 +515,7 @@ function getSortedIngredientList(tech)
     if (tech.ingredients) then
         local ingredientsList = {}
         for k, v in pairs(tech.ingredients) do
-            ingredientsList[global.researchIngredients.byName[k]] = true
+            ingredientsList[storage.researchIngredients.byName[k]] = true
         end
         return ingredientsList
     end
@@ -535,7 +535,7 @@ function getIngredientString(tech)
 end
 
 script.on_nth_tick(300, function()
-    if (table_size(global) == 0) then 
+    if (table_size(storage) == 0) then 
         refreshResearch() 
     end
     checkButtonExistence()
@@ -551,7 +551,7 @@ function buildIngredientGroupTables()
     local index = {}
     -- build list of ingredient strings
     local count = 0
-    for k, v in pairs(global.allTechnologies.byName) do
+    for k, v in pairs(storage.allTechnologies.byName) do
         if (not index[v.ingredientString]) then
             count = count + 1
             index[v.ingredientString] = count
@@ -562,26 +562,26 @@ function buildIngredientGroupTables()
 
     table.sort(tbl, compareIngredientStrings)
 
-    global.researchIngredients.groupStringOrder = tbl
-    global.researchIngredients.groupStringOrderIndex = table.flip(tbl)
+    storage.researchIngredients.groupStringOrder = tbl
+    storage.researchIngredients.groupStringOrderIndex = table.flip(tbl)
 
-    global.researchIngredients.byGroupString = {}
-    global.allTechnologies.byIngredientGroup = {}
+    storage.researchIngredients.byGroupString = {}
+    storage.allTechnologies.byIngredientGroup = {}
     for k, v in pairs(tbl) do
         local ingTable = {}
         local splitIng = v:split('%d+')
         for k2, v2 in pairs(splitIng) do
-            table.insert(ingTable, global.researchIngredients.byID[tonumber(v2)])
+            table.insert(ingTable, storage.researchIngredients.byID[tonumber(v2)])
         end
-        global.researchIngredients.byGroupString[v] = ingTable
-        global.allTechnologies.byIngredientGroup[v] = {}
+        storage.researchIngredients.byGroupString[v] = ingTable
+        storage.allTechnologies.byIngredientGroup[v] = {}
     end
 
-    for k, v in pairs(global.allTechnologies.byName) do
-        table.insert(global.allTechnologies.byIngredientGroup[v.ingredientString], v)
+    for k, v in pairs(storage.allTechnologies.byName) do
+        table.insert(storage.allTechnologies.byIngredientGroup[v.ingredientString], v)
     end
 
-    print("Research Counter: Building Ingredient Group Tables!")
+    -- print("Research Counter: Building Ingredient Group Tables!")
 
 end
 
@@ -609,15 +609,15 @@ function compareIngredientStrings(a, b)
 end
 
 function splitString(str, delim, rightToLeft)
-    print("Splitting string...")
+    -- print("Splitting string...")
     local tbl = {}
     if (type(delim) == 'number') then
         if (rightToLeft) then
             for i=#str, 1, -delim do
                 local substr = str:sub(math.max(i - delim + 1, 1), i)
-                print('i:' .. i)
-                print('i - delim:' .. i - delim)
-                print('substring of '.. i - delim ..' to '.. i ..': ' .. substr)
+                -- print('i:' .. i)
+                -- print('i - delim:' .. i - delim)
+                -- print('substring of '.. i - delim ..' to '.. i ..': ' .. substr)
                 table.insert(tbl, substr)
             end
         else
